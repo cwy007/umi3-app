@@ -1,6 +1,6 @@
 import { Effect, Reducer, Subscription, request } from 'umi';
 
-interface HeroProps {
+export interface HeroProps {
   ename: number;
   cname: string;
   title: string;
@@ -11,7 +11,9 @@ interface HeroProps {
 export interface HeroModelState {
   name: string;
   heros: HeroProps[];
+  freeheros: HeroProps[];
   filterKey: number;
+  itemHover: number;
 }
 export interface HeroModelType {
   namespace: 'hero';
@@ -32,7 +34,9 @@ const HeroModel: HeroModelType = {
   state: {
     name: 'hero',
     heros: [],
+    freeheros: [],
     filterKey: 0,
+    itemHover: 0,
   },
 
   effects: {
@@ -49,7 +53,17 @@ const HeroModel: HeroModelType = {
       //     ename: 110,
       //   }),
       // });
-      const data = yield request('/herolist.json');
+      const herolist = yield request('/herolist.json');
+      const freeheros = yield request('mock/freeheros.json', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify({
+          number: 10,
+        }),
+      });
       const localData = [
         {
           ename: 105,
@@ -71,7 +85,8 @@ const HeroModel: HeroModelType = {
       yield put({
         type: 'save',
         payload: {
-          heros: data || localData,
+          heros: herolist,
+          freeheros,
         },
       });
     },

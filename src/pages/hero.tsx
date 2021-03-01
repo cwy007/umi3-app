@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import styles from './hero.less';
 import { connect, HeroModelState, ConnectProps } from 'umi';
 import { Row, Col, Radio, Card } from 'antd';
+import FreeHeroItem from '@/components/FreeHeroItem';
 
 interface PageProps extends ConnectProps {
   hero: HeroModelState;
@@ -20,7 +21,7 @@ const heroType = [
 
 const Hero: FC<PageProps> = ({ hero, dispatch }) => {
   // console.log(props.hero);
-  const { heros = [], filterKey = 0 } = hero;
+  const { heros = [], filterKey = 0, freeheros = [], itemHover = 0 } = hero;
   const onChange = (e) => {
     //  console.log(e.target.value);
     dispatch!({
@@ -30,8 +31,36 @@ const Hero: FC<PageProps> = ({ hero, dispatch }) => {
       },
     });
   };
+  // onItemHover 是在子组件内部调用的
+  const onItemHover = (index: number) => {
+    console.log(index);
+    dispatch!({
+      type: 'hero/save',
+      payload: {
+        itemHover: index,
+      },
+    });
+  };
   return (
-    <>
+    <div className={styles.normal}>
+      <div className={styles.info}>
+        <Row className={styles.freehero}>
+          <Col span={24}>
+            <p>周免英雄</p>
+            <div>
+              {freeheros.map((data, index) => (
+                <FreeHeroItem
+                  data={data}
+                  itemHover={itemHover}
+                  onItemHover={onItemHover}
+                  thisIndex={index}
+                  key={index}
+                />
+              ))}
+            </div>
+          </Col>
+        </Row>
+      </div>
       <Card className={styles.radioPanel}>
         <RadioGroup onChange={onChange} value={filterKey}>
           {heroType.map((data) => (
@@ -54,7 +83,7 @@ const Hero: FC<PageProps> = ({ hero, dispatch }) => {
             </Col>
           ))}
       </Row>
-    </>
+    </div>
   );
 };
 
